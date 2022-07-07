@@ -6,7 +6,7 @@
     - OAuth token: **BQAw2qdili1ZWJS6EV165n-I-_MfHYvR72XfcAJRv0nLr9eRb_xcvb4l2uI3u9Y6uTQQ3VGpwCNa_m2FgvAA0tGs7MOhJagYYaFdfGY76TZLmuDT9eqYCb1Hu8cV-g1vVszb2B272yOLNlh72ne_nxib-
 2.  Load, parse json data into dataframe
     - if there are multiple artists for track and album, append them to an ordered list into their dataframe column
-      - for metadata purposes
+      - **for metadata purposes**
     -  add duplicate protection in the future if i want to download songs from the same playlist again but not want to redownload the same songs
        -  keep id and name fields for track, album, artists
        -  export dataframe into another json
