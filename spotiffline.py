@@ -1,41 +1,46 @@
-from random import random
+import random
 import string
 import base64
-from urllib import response
 import requests, json
 from secret_ids import CLIENT_ID, CLIENT_SECRET
+import hashlib
 
+
+BASE_URI = "https://api.spotify.com/v1"
+REDIRECT_URI = "spotiffline-login://callback"
 PLAYLIST_ID = "3Zx2NoPvIYWst3GYQrAyb3"
 ACCESS_TOKEN = "BQAt1iR6hGGw4h8fTPQqBFkWNgJFTqjiSF2XSv7xVHHcgFNKCVkexu6PMWNCqgeeub-Y17j5noeuxHWFV3SCF_1FIgnWwnasiXVwc9cm92QrwQdhwd3MsDmW1qHtsvBYoI5xW2bXhpi6GZUFYxqO4Hq66sAL3lt1EkgD-M7-rtGoi551qatJf8tves3z8Q0"
 ENDPOINT_PLAYLIST = f"https://api.spotify.com/v1/playlists/{PLAYLIST_ID}/tracks"
 FIELDS = """items(added_at,track(name,duration_ms,album(name,images,artists),artists))"""
 ENDPOINT_PLAYLIST_WITH_FIELDS = ENDPOINT_PLAYLIST + f"?fields={FIELDS}"
-ENDPOINT_OAUTH = "https://accounts.spotify.com/api/token"
-ENDPOINT_IMPLICIT = "https://accounts.spotify.com/authorize"
+ENDPOINT_APITOKEN = "https://accounts.spotify.com/api/token"
+ENDPOINT_AUTHORIZE = "https://accounts.spotify.com/authorize"
 LENGTH = 16
 
 def randomString(length):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(length))
 
+
 def auth_implicit_grant():
     # working, returns code 200 but found out later that this is 
-    # for clients implemented entirely in JS and running in a browser
+    # for clients implemented entirely in JS and running in a browser.
+    # URL Hash values are not accessible server side, theyre not included in headers
     response = requests.get(
-        ENDPOINT_IMPLICIT,
+        ENDPOINT_AUTHORIZE,
         {
         "client_id" : CLIENT_ID,
         "response_type" : "token",
         "redirect_uri" : "spotiffline-login://callback", 
         "state" : randomString(LENGTH)
     })
-    return response # returns URL containing hash fragment with data encoded as query string
+    return response # returns URL containing hash fragment with data encoded as query string, not JSON object
 
 def auth_client_credentials():
     # Working, returns access token in response but this flow
     # does not grant access to user information (if playlist is public we go this route)
     response = requests.post(
-        ENDPOINT_OAUTH,
+        ENDPOINT_APITOKEN,
         # query parameter
         {
         "grant_type" : "client_credentials",
@@ -45,6 +50,25 @@ def auth_client_credentials():
     )
     return response.json()
 
+def auth_code():
+    # Request user authorization
+    response = requests.get(
+        "https://accounts.spotify.com/authorize",
+        {
+            "client_id" : CLIENT_ID,
+            "response_type" : "code",
+            "redirect_uri" : REDIRECT_URI,
+            # "state" : randomString(LENGTH),
+            # "scope" : "playlist-read-private",
+
+            # PKCE Extension
+            # "code_challenge_method" : "S256",
+            # "code_challenge" : base64.b64encode(hashlib.sha256(randomString(50).encode('utf-8')).digest())
+        },
+    )
+
+    
+    return response
 
 def fetch_json():
     # No authorization, need to manually refresh access token in API 
@@ -64,6 +88,9 @@ def fetch_json():
 
 def main():
     # --- STAGE 0 ---
+    # Auth code flow
+    response_auth = auth_code()
+    print(response_auth)
 
     # Client Credentials
     # response_auth = auth_client_credentials()
