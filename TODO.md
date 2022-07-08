@@ -8,7 +8,7 @@
 
 [Authorization scopes (may not required)](https://developer.spotify.com/documentation/general/guides/authorization/scopes/)
 
- - no need for authorization if you set the playlist to public
+ - no need for authorization if you set the playlist to public but i'll have to do anyway because of oauth2 guidelines
 
 - [x] Retrieve JSON from [spotify API](https://developer.spotify.com/console/get-playlist-tracks/?playlist_id=3Zx2NoPvIYWst3GYQrAyb3&market=ES&fields=items(added_at%2Ctrack(name%2Cduration_ms%2Calbum(name%2Cimages%2Cartists)%2Cartists))&limit=&offset=&additional_types=)
   - playlist_id: **3Zx2NoPvIYWst3GYQrAyb3**
@@ -17,6 +17,11 @@
     - [x] fields: **items(added_at,track(name,duration_ms,album(name,images,artists),artists))**
     - OAuth token **THIS WILL CHANGE, SEE FILE FOR UPDATED**: **BQAw2qdili1ZWJS6EV165n-I-_MfHYvR72XfcAJRv0nLr9eRb_xcvb4l2uI3u9Y6uTQQ3VGpwCNa_m2FgvAA0tGs7MOhJagYYaFdfGY76TZLmuDT9eqYCb1Hu8cV-g1vVszb2B272yOLNlh72ne_nxib-
       -  [ ] register application in developer API to have permanent auths
+- STAGE 0 - [ ] Implement authorization so that the app automatically requests a new access token 
+  - [ ] PCKE OR Implicit grant 
+    - PCKE provides protection against request forgery
+    - Implicit returns token in URL and doesnt support refresh tokens but is easier to implement
+    - [ ] Thinking of doing client credentials, it does not require a backend service to be secure
 - [ ]  Load, parse json data into dataframe
     - [ ] if there are multiple artists for track and album, append them to an ordered list into their dataframe column
       - **for metadata purposes**
