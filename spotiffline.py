@@ -66,9 +66,23 @@ def auth_code():
             # "code_challenge" : base64.b64encode(hashlib.sha256(randomString(50).encode('utf-8')).digest())
         },
     )
-
-    
     return response
+
+def request_access_token(code):
+    # Exchange authorization code for Access Token
+    response = requests.get(
+        url="https://accounts.spotify.com/api/token",
+        data={
+            "grant_type" : "authorization_code",
+            "code" : code,
+            "redirect_uri" : REDIRECT_URI,
+        },
+        headers={
+            # "Authorization" : f"Basic {base64.b64encode(bytes(CLIENT_ID, 'utf-8'))}:{base64.b64encode(bytes(CLIENT_SECRET, 'utf-8'))}",
+            "Authorization" : f"Basic {base64.urlsafe_b64encode((CLIENT_ID + ':' + CLIENT_SECRET).encode('ascii')).decode('ascii')}",
+            "Content-Type" : "application/x-www-form-urlencoded"
+        }
+    )
 
 def fetch_json():
     # No authorization, need to manually refresh access token in API 
@@ -91,6 +105,11 @@ def main():
     # Auth code flow
     response_auth = auth_code()
     print(response_auth)
+
+    if response_auth.status_code == 200:
+        token = request_access_token(response_auth)
+        print(token)
+
 
     # Client Credentials
     # response_auth = auth_client_credentials()
