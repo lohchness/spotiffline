@@ -1,13 +1,14 @@
 import random
 import string
 import base64
-import requests, json
+from urllib import response
+import requests
 from secret_ids import CLIENT_ID, CLIENT_SECRET
-import hashlib
-
+import webbrowser
 
 BASE_URI = "https://api.spotify.com/v1"
-REDIRECT_URI = "spotiffline-login://callback"
+# REDIRECT_URI = "spotiffline-login://callback"
+REDIRECT_URI = "https://localhost/"
 PLAYLIST_ID = "3Zx2NoPvIYWst3GYQrAyb3"
 ACCESS_TOKEN = "BQAt1iR6hGGw4h8fTPQqBFkWNgJFTqjiSF2XSv7xVHHcgFNKCVkexu6PMWNCqgeeub-Y17j5noeuxHWFV3SCF_1FIgnWwnasiXVwc9cm92QrwQdhwd3MsDmW1qHtsvBYoI5xW2bXhpi6GZUFYxqO4Hq66sAL3lt1EkgD-M7-rtGoi551qatJf8tves3z8Q0"
 ENDPOINT_PLAYLIST = f"https://api.spotify.com/v1/playlists/{PLAYLIST_ID}/tracks"
@@ -69,8 +70,13 @@ def auth_code():
     return response
 
 def request_access_token(code):
+    # Turns out for auth code flow we need a web server to recieve 
+    # access tokens so we will go for client credentials instead
+    to_encode = f"{CLIENT_ID}:{CLIENT_SECRET}".encode()
+    b64encoded = base64.urlsafe_b64encode(to_encode)
+    decodedstring = b64encoded.decode()
     # Exchange authorization code for Access Token
-    response = requests.get(
+    response = requests.post(
         url="https://accounts.spotify.com/api/token",
         data={
             "grant_type" : "authorization_code",
@@ -79,10 +85,11 @@ def request_access_token(code):
         },
         headers={
             # "Authorization" : f"Basic {base64.b64encode(bytes(CLIENT_ID, 'utf-8'))}:{base64.b64encode(bytes(CLIENT_SECRET, 'utf-8'))}",
-            "Authorization" : f"Basic {base64.urlsafe_b64encode((CLIENT_ID + ':' + CLIENT_SECRET).encode('ascii')).decode('ascii')}",
+            "Authorization" : f"Basic {decodedstring}",
             "Content-Type" : "application/x-www-form-urlencoded"
         }
     )
+    return response
 
 def fetch_json():
     # No authorization, need to manually refresh access token in API 
@@ -103,12 +110,13 @@ def fetch_json():
 def main():
     # --- STAGE 0 ---
     # Auth code flow
-    response_auth = auth_code()
-    print(response_auth)
+    # response_auth = auth_code()
+    # print(response_auth)
+    # webbrowser.open(response_auth.url)
 
-    if response_auth.status_code == 200:
-        token = request_access_token(response_auth)
-        print(token)
+    # if response_auth.status_code == 200:
+    #     token = request_access_token(response_auth)
+    #     print(token)
 
 
     # Client Credentials
