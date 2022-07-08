@@ -18,6 +18,7 @@
     - OAuth token **THIS WILL CHANGE, SEE FILE FOR UPDATED**: **BQAw2qdili1ZWJS6EV165n-I-_MfHYvR72XfcAJRv0nLr9eRb_xcvb4l2uI3u9Y6uTQQ3VGpwCNa_m2FgvAA0tGs7MOhJagYYaFdfGY76TZLmuDT9eqYCb1Hu8cV-g1vVszb2B272yOLNlh72ne_nxib-
       -  [ ] register application in developer API to have permanent auths
 - STAGE 0 - [ ] Implement authorization so that the app automatically requests a new access token 
+  - TRY NOT TO USE SPOTIPY
   - [ ] PCKE OR Implicit grant 
     - PCKE provides protection against request forgery
     - Implicit returns token in URL and doesnt support refresh tokens but is easier to implement
@@ -37,3 +38,7 @@
     	- change the q field to change query
 	- only allowed 10000 units per day, search costs 100 units so 100 songs per day
 	- in progress will expand once closer 
+
+- Housekeeping:
+  - clean up constants/magic numbers, especially endpoints. Use Base URI
+  - add section to get list of a users playlists?
