@@ -1,13 +1,8 @@
-import random
-import string
-import base64
-from urllib import response
-import requests
+import requests, base64
+import string, pprint, random # delete when finished
 from secret_ids import CLIENT_ID, CLIENT_SECRET
-import webbrowser
 
 BASE_URI = "https://api.spotify.com/v1"
-# REDIRECT_URI = "spotiffline-login://callback"
 REDIRECT_URI = "https://localhost/"
 PLAYLIST_ID = "3Zx2NoPvIYWst3GYQrAyb3"
 ACCESS_TOKEN = "BQAt1iR6hGGw4h8fTPQqBFkWNgJFTqjiSF2XSv7xVHHcgFNKCVkexu6PMWNCqgeeub-Y17j5noeuxHWFV3SCF_1FIgnWwnasiXVwc9cm92QrwQdhwd3MsDmW1qHtsvBYoI5xW2bXhpi6GZUFYxqO4Hq66sAL3lt1EkgD-M7-rtGoi551qatJf8tves3z8Q0"
@@ -18,12 +13,11 @@ ENDPOINT_APITOKEN = "https://accounts.spotify.com/api/token"
 ENDPOINT_AUTHORIZE = "https://accounts.spotify.com/authorize"
 LENGTH = 16
 
-def randomString(length):
+def randomString(length): # DEPRECATED
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(length))
 
-
-def auth_implicit_grant():
+def auth_implicit_grant(): # DEPRECATED
     # working, returns code 200 but found out later that this is 
     # for clients implemented entirely in JS and running in a browser.
     # URL Hash values are not accessible server side, theyre not included in headers
@@ -38,20 +32,28 @@ def auth_implicit_grant():
     return response # returns URL containing hash fragment with data encoded as query string, not JSON object
 
 def auth_client_credentials():
+    encodedstr = f"{CLIENT_ID}:{CLIENT_SECRET}".encode()
+    b64encoded = base64.urlsafe_b64encode(encodedstr)
+    decodedstring = b64encoded.decode()
     # Working, returns access token in response but this flow
-    # does not grant access to user information (if playlist is public we go this route)
+    # does not grant access to user information, can only access public information
+    # If auth code flow needs external web service we go this route
     response = requests.post(
         ENDPOINT_APITOKEN,
         # query parameter
-        {
+        data={
         "grant_type" : "client_credentials",
-        "client_id" : CLIENT_ID,
-        "client_secret" : CLIENT_SECRET
+        # "client_id" : CLIENT_ID,
+        # "client_secret" : CLIENT_SECRET
+        },
+        headers={
+            "Authorization" : f"Basic {decodedstring}",
+            "Content-Type" : "application/x-www-form-urlencoded",
         }
     )
-    return response.json()
+    return response
 
-def auth_code():
+def auth_code(): # DEPRECATED
     # Request user authorization
     response = requests.get(
         "https://accounts.spotify.com/authorize",
@@ -69,7 +71,7 @@ def auth_code():
     )
     return response
 
-def request_access_token(code):
+def request_access_token(code): # DEPRECATED
     # Turns out for auth code flow we need a web server to recieve 
     # access tokens so we will go for client credentials instead
     to_encode = f"{CLIENT_ID}:{CLIENT_SECRET}".encode()
@@ -84,54 +86,38 @@ def request_access_token(code):
             "redirect_uri" : REDIRECT_URI,
         },
         headers={
-            # "Authorization" : f"Basic {base64.b64encode(bytes(CLIENT_ID, 'utf-8'))}:{base64.b64encode(bytes(CLIENT_SECRET, 'utf-8'))}",
             "Authorization" : f"Basic {decodedstring}",
             "Content-Type" : "application/x-www-form-urlencoded"
         }
     )
     return response
 
-def fetch_json():
-    # No authorization, need to manually refresh access token in API 
-    # TODO: Change Access Token to new access token granted by auth request
+def get_playlist_items(access_token, playlist_id):
     response = requests.get(
-        ENDPOINT_PLAYLIST,
+        playlist_id,
         headers={
             "Accept" : "application/json",
             "Content-Type" : "application/json",
-            "Authorization" : f"Bearer {ACCESS_TOKEN}"
+            "Authorization" : f"Bearer {access_token}"
         },
     )
-    response_json = response.json()
 
-    return response_json
+    return response
 
 
 def main():
     # --- STAGE 0 ---
-    # Auth code flow
-    # response_auth = auth_code()
-    # print(response_auth)
-    # webbrowser.open(response_auth.url)
-
-    # if response_auth.status_code == 200:
-    #     token = request_access_token(response_auth)
-    #     print(token)
-
 
     # Client Credentials
-    # response_auth = auth_client_credentials()
+    response_auth = auth_client_credentials()
+    print(response_auth)
+    print(response_auth.json())
+    print(response_auth.json()["access_token"])
+    
+    if response_auth.status_code == 200:
+        items = get_playlist_items(response_auth.json()['access_token'], ENDPOINT_PLAYLIST_WITH_FIELDS)
+        pprint.pprint(items.json(), indent=4)
 
-    # Implicit grant
-    # response_auth = auth_implicit_grant()
-
-    # --- STAGE 1 ---
-    # parse_json = fetch_json()
-    # pprint.pprint(parse_json)
-    # with open(f"{PLAYLIST_ID}.json", "w") as file:
-    #     json.dump(parse_json, file)
-
-    # --- STAGE 2 ---
     return
 
 if __name__ == '__main__':
