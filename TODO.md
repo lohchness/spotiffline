@@ -30,7 +30,7 @@
 - [x] Retrieve JSON from [spotify API](<https://developer.spotify.com/console/get-playlist-tracks/?playlist_id=3Zx2NoPvIYWst3GYQrAyb3&market=ES&fields=items(added_at%2Ctrack(name%2Cduration_ms%2Calbum(name%2Cimages%2Cartists)%2Cartists))&limit=&offset=&additional_types=>)
 
   - [ ] will ask user for playlist link and number of tracks to retrieve from an unsorted playlist as well as offset
-  - [ ] also ask number of songs from a playlist sorted by most recent
+  - ❌ also ask number of songs from a playlist sorted by most recent
   - [x] fields: **items(added_at,track(name,duration_ms,album(name,images,artists),artists))**
 
 ### STAGE 2: Duplication check
@@ -47,14 +47,19 @@
    - at first I was thinking of having the search term be "ARTIST_NAME TRACK_NAME audio" to filter out music videos, but
    - eg appending "audio" to "The Birthday Massacre - Oceania" will return a url to a nightcore version
      - appending "-nightcore" to exclude will return a completely different song by the same band
-   - I weighed the choices and just ended up searching for the term without "audio" because most of the songs in my playlist shouldn't have music videos anyway.
- - [ ] Retrieve URL of search term using youtubesearchpython.videosSearch("{TERM}", limit=1).result
+     - even adding "audio" to the end of the search query may return an unofficial video with low views or low quality.
+   - I weighed the choices and just ended up searching for the term without "audio -acoustic" because most of the songs in my playlist shouldn't have music videos anyway.
+ - [x] Retrieve URL of search term using youtubesearchpython.videosSearch("{TERM}", limit=1).result
    - then redirect to yt-dlp for download
- - [ ] OR Use yt-dlp to download video and convert audio from search term
+   - I could just use subprocess.popen to run the command to download from a search query from terminal, but is more complicated
+     - if it works, don't fix it
+ - [x] OR Use yt-dlp to download video and convert audio from search term
    - command line is yt-dlp -x "ytsearch1: {QUERY}"
      - automatically downloads best format, but only audio quality rating of 5/10
      - can add --audio-quality 0 for best quality but shouldnt be a problem
    - This will download video first, then convert to audio using ffmpeg. Not feasible for bandwidth restrictions but it suits my purpose. Each download seems to be around 4 MB, so 100 songs is 400 MB downloaded.
+   - RECOMMEND MAX 250 SONGS TO DOWNLOAD
+     - Each song download is around 4-5 MB, having 250 songs will download at least 1GB. Or you can just go ahead and download more, you have been warned.
 
 
 ##### Housekeeping
