@@ -33,30 +33,29 @@
   - [ ] also ask number of songs from a playlist sorted by most recent
   - [x] fields: **items(added_at,track(name,duration_ms,album(name,images,artists),artists))**
 
-### STAGE 2: Data processing and duplication check
+### STAGE 2: Duplication check
 
-- [ ] Parse and clean json data with pandas
-  - [ ] discard unnecessary fields like href, url
-  - [ ] if there are multiple artists for track and album, append them to an ordered list into their dataframe column
-    - **for metadata purposes**
 - [ ] add duplicate protection in the future if i want to download songs from the same playlist again but not want to redownload the same songs
-  - keep id and name fields for track, album, artists
-  - export dataframe into another json
+  - [ ] CHECK IF TRACK IS ALREADY IN JSON FILE
+    - Need to ask user how many tracks are in playlist so it can retrieve all playlist items
+      - Choose between getting all items in playlist OR just at most 100 recently added tracks
 - [ ] download 640x640 thumbnail from images field for Stage 4
 
 
-### STAGE 3: Access Youtube API
+### STAGE 3: Download audio
+ - SEARCH TERMS DO NOT GUARANTEE A RETURN OF THE CORRECT VIDEO
+   - at first I was thinking of having the search term be "ARTIST_NAME TRACK_NAME audio" to filter out music videos, but
+   - eg appending "audio" to "The Birthday Massacre - Oceania" will return a url to a nightcore version
+     - appending "-nightcore" to exclude will return a completely different song by the same band
+   - I weighed the choices and just ended up searching for the term without "audio" because most of the songs in my playlist shouldn't have music videos anyway.
+ - [ ] Retrieve URL of search term using youtubesearchpython.videosSearch("{TERM}", limit=1).result
+   - then redirect to yt-dlp for download
+ - [ ] OR Use yt-dlp to download video and convert audio from search term
+   - command line is yt-dlp -x "ytsearch1: {QUERY}"
+     - automatically downloads best format, but only audio quality rating of 5/10
+     - can add --audio-quality 0 for best quality but shouldnt be a problem
+   - This will download video first, then convert to audio using ffmpeg. Not feasible for bandwidth restrictions but it suits my purpose. Each download seems to be around 4 MB, so 100 songs is 400 MB downloaded.
 
-- [ ] Use Youtube API to retrieve URL from a search term
-  - [ ] Use youtube-search-python module. NOT MAINTAINED AS OF 23/6/2022. MAY NOT WORK A FEW MONTHS DOWN THE LINE.
-    - This should avoid the daily API quota limit
-    - [ ] If youtube-search-python doesn't work anymore, use beautifulsoup instead. Or just use the YT API but limited by daily quota.
-  - search term is "{artist} {song name} audio"
-    - should avoid music videos with intros/outros
-  - [YT API link](https://developers.google.com/youtube/v3/docs/search/list?apix=true) - change the q field to change query
-  - only allowed 10000 units per day. Searching costs 100 units so 100 songs per day
-
-### STAGE 4: Download and add metadata
 
 ##### Housekeeping
 
