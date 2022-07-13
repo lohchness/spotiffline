@@ -29,17 +29,19 @@
 
 - [x] Retrieve JSON from [spotify API](<https://developer.spotify.com/console/get-playlist-tracks/?playlist_id=3Zx2NoPvIYWst3GYQrAyb3&market=ES&fields=items(added_at%2Ctrack(name%2Cduration_ms%2Calbum(name%2Cimages%2Cartists)%2Cartists))&limit=&offset=&additional_types=>)
 
-  - [ ] will ask user for playlist link and number of tracks to retrieve from an unsorted playlist as well as offset
+  - [x] will ask user for playlist link and number of tracks to retrieve from an unsorted playlist as well as offset
   - ❌ also ask number of songs from a playlist sorted by most recent
+    - no can do, spotify api doesn't allow this unless i request the entire playlist. So I'll just add an option to download either the first 100 songs, unsorted, or just the entire playlist 
   - [x] fields: **items(added_at,track(name,duration_ms,album(name,images,artists),artists))**
 
-### STAGE 2: Duplication check
+### STAGE 2: Duplication check and metadata prep
 
-- [ ] add duplicate protection in the future if i want to download songs from the same playlist again but not want to redownload the same songs
-  - [ ] CHECK IF TRACK IS ALREADY IN JSON FILE
+- I have decided that I don't care
+- ❌ add duplicate protection in the future if i want to download songs from the same playlist again but not want to redownload the same songs
+  - ❌ CHECK IF TRACK IS ALREADY IN JSON FILE
     - Need to ask user how many tracks are in playlist so it can retrieve all playlist items
       - Choose between getting all items in playlist OR just at most 100 recently added tracks
-- [ ] download 640x640 thumbnail from images field for Stage 4
+- ❌ download 640x640 thumbnail from images field for Stage 4
 
 
 ### STAGE 3: Download audio
