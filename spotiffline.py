@@ -73,9 +73,10 @@ def download_tracks(keep_track, download_directory, offset=0):
 		print(f"\n------------ SONG #{count}: {', '.join([i for i in curr_artists])} - {curr_track_name} -------------------")
 		
 		# Download track into directory
+		curr_track_name = curr_track_name.replace('/','.').replace('\\','.')
 		ydl_opts = {
 			'format': 'bestaudio',
-			'outtmpl' : f"{download_directory}/{', '.join([i for i in curr_artists])} - {curr_track_name.replace('/','.').replace('\\','.')}.%(ext)s",
+			'outtmpl' : f"{download_directory}/{', '.join([i for i in curr_artists])} - {curr_track_name}.%(ext)s",
 			'postprocessors': [{
 				'key': 'FFmpegExtractAudio',
 			}]
